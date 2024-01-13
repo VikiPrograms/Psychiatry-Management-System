@@ -72,7 +72,6 @@ namespace DatabaseLayer
                 {
                     patientFromDb.FirstName=item.FirstName;
                     patientFromDb.LastName=item.LastName;
-                    patientFromDb.User=item.User;
                     patientFromDb.Treatment=item.Treatment;
                     patientFromDb.AdmissionDate=item.AdmissionDate;
                     patientFromDb.Checkout=item.Checkout;

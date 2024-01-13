@@ -22,11 +22,10 @@ namespace BusinessLayer
         public DateTime AdmissionDate { get; set; }
         public DateTime? Checkout { get; set; }
         public Room Room { get; set; }
-        public User User { get; set; }
         public Treatment Treatment { get; set; }//for the doctor
 
         public Patient() { }
-        public Patient(string firstName, string lastName, int age, DateTime admissionDate, DateTime? checkout, Room room, User user, Treatment treatment)
+        public Patient(string firstName, string lastName, int age, DateTime admissionDate, DateTime? checkout, Room room, Treatment treatment)
         {         
             FirstName = firstName;
             LastName = lastName;
@@ -34,7 +33,6 @@ namespace BusinessLayer
             AdmissionDate = admissionDate;
             Checkout = checkout;
             Room = room;
-            User = user;
             Treatment = treatment;
         }
     }

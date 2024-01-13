@@ -30,6 +30,5 @@ namespace DatabaseLayer
         public DbSet<Patient> Patients { get; set; }
         public DbSet<Room> Rooms { get; set; }
         public DbSet<Treatment> Treatments { get; set; }
-
     }
 }
