@@ -16,75 +16,82 @@ namespace DatabaseLayer
             this.dbContext = dbContext;
         }
 
-        public void Create(Medication item)
+        public async Task CreateAsync(Medication item)
         {
             try
             {
                 dbContext.Medications.Add(item);
-                dbContext.SaveChanges();
-            }
-            catch (Exception) { throw; }
-        }
-
-        public void Delete(int key)
-        {
-            try
-            {
-                Medication medicationFromdB = Read(key);
-                if(medicationFromdB != null)
-                {
-                    dbContext.Medications.Remove(medicationFromdB);
-                    dbContext.SaveChanges();
-                }
-                else
-                {
-                    throw new InvalidOperationException("Medication with that key does not exist!");
-                }
-            }
-            catch (Exception) { throw; }
-        }
-
-        public Medication Read(int key, bool usenavigationalproperties = false)
-        {
-            try
-            {
-                    return dbContext.Medications.Find(key);
+                await dbContext.SaveChangesAsync();
             }
             catch(Exception) { throw; }
         }
 
-        public IEnumerable<Medication> ReadAll(bool usenavigationalproperties = false)
+        public async Task DeleteAsync(int key)
+        {
+            try
+            {
+                Medication medicationFromDb = await ReadAsync(key, false, false);
+
+                if(medicationFromDb != null)
+                {
+                    dbContext.Medications.Remove(medicationFromDb);
+                    await dbContext.SaveChangesAsync();
+                }
+                else
+                {
+                    throw new ArgumentException("This medication does not exist!");
+                }
+            }
+            catch (Exception) { throw; }
+
+        }
+
+        public async Task<ICollection<Medication>> ReadAllAsync(bool useNavigationalProperties = false, bool isReadOnly = true)
         {
             try
             {
                 IQueryable<Medication> query = dbContext.Medications;
-                return query.ToList();
+                if (isReadOnly)
+                {
+                    query = query.AsNoTrackingWithIdentityResolution();
+                }
+
+                return await query.ToListAsync();
             }
-            catch (Exception)
-            {
-                throw;
-            }
+            catch (Exception) { throw; }
+
         }
 
-        public void Update(Medication item, bool usenavigationalproperties = false)
+        public async Task<Medication> ReadAsync(int key, bool useNavigationalProperties = false, bool isReadOnly = true)
         {
             try
             {
-                Medication medicationFromDb = Read(item.MedicationId, usenavigationalproperties);
-                if(medicationFromDb == null)
+                IQueryable<Medication> query = dbContext.Medications;
+                if (isReadOnly)
                 {
-                    Create(item);
-                    return;
+                    query = query.AsNoTrackingWithIdentityResolution();
                 }
-                medicationFromDb.Name= item.Name;
-                medicationFromDb.Description= item.Description;
-                medicationFromDb.Treatment = item.Treatment;
-                medicationFromDb.Cost = item.Cost;
-                medicationFromDb.Quantity = item.Quantity;
 
-                dbContext.SaveChanges();
+                return await query.FirstOrDefaultAsync(m => m.MedicationId == key);
             }
             catch (Exception) { throw; }
+
+        }
+
+        public async Task UpdateAsync(Medication item, bool useNavigationalProperties = false)
+        {
+            try
+            {
+                Medication medicationFromDb = await ReadAsync(item.MedicationId, useNavigationalProperties, false);
+                medicationFromDb.Cost = item.Cost;
+                medicationFromDb.Quantity = item.Quantity;
+                medicationFromDb.Name = item.Name;
+                medicationFromDb.Description = item.Description;
+
+                await dbContext.SaveChangesAsync();
+            }
+            catch (Exception) { throw; }
+
         }
     }
 }

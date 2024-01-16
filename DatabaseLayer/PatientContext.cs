@@ -1,5 +1,6 @@
 ﻿using BusinessLayer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Identity.Client;
 using System;
 using System.Collections.Generic;
@@ -18,66 +19,72 @@ namespace DatabaseLayer
             this.dbContext = dbContext;
         }
 
-        public void Create(Patient item)
+        public async Task CreateAsync(Patient item)
         {
             try
             {
                 dbContext.Patients.Add(item);
-                dbContext.SaveChanges();
+                await dbContext.SaveChangesAsync();
             }
-            catch(Exception) { throw; }
+            catch (Exception) { throw; }
         }
 
-        public void Delete(int key)
+        public async Task DeleteAsync(int key)
         {
             try
             {
-                Patient patientFromDb = Read(key);
+                Patient patientFromDb = await ReadAsync(key, false, false);
+                if(patientFromDb is null)
+                {
+                    throw new ArgumentException("This patient does not exist!");
+                }
+
                 dbContext.Patients.Remove(patientFromDb);
-                dbContext.SaveChanges();
+                await dbContext.SaveChangesAsync();
             }
             catch (Exception) { throw; }
         }
 
-        public Patient Read(int key, bool usenavigationalproperties = false)
-        {
-            try
-            {
-                return dbContext.Patients.Find(key);
-            }
-            catch (Exception) { throw; }
-        }
-
-        public IEnumerable<Patient> ReadAll(bool usenavigationalproperties = false)
+        public async Task<ICollection<Patient>> ReadAllAsync(bool useNavigationalProperties = false, bool isReadOnly = true)
         {
             try
             {
                 IQueryable<Patient> query = dbContext.Patients;
-                return query.ToList();
+                if (isReadOnly)
+                {
+                    query = query.AsNoTrackingWithIdentityResolution();
+                }
+                return await query.ToListAsync();
+
             }
             catch (Exception) { throw; }
         }
 
-        public void Update(Patient item, bool usenavigationalproperties = false)
+        public async Task<Patient> ReadAsync(int key, bool useNavigationalProperties = false, bool isReadOnly = true)
         {
             try
             {
-                Patient patientFromDb = Read(item.PatientId, usenavigationalproperties);
-                if(patientFromDb != null)
+                IQueryable<Patient> query = dbContext.Patients;
+                if (isReadOnly)
                 {
-                    Create(item);
-                    dbContext.SaveChanges();
+                    query = query.AsNoTrackingWithIdentityResolution();
                 }
-                else
-                {
-                    patientFromDb.FirstName=item.FirstName;
-                    patientFromDb.LastName=item.LastName;
-                    patientFromDb.Treatment=item.Treatment;
-                    patientFromDb.AdmissionDate=item.AdmissionDate;
-                    patientFromDb.Checkout=item.Checkout;
-                    patientFromDb.Room=item.Room;
-                    patientFromDb.Age=item.Age;
-                }
+                return await query.FirstOrDefaultAsync(p => p.PatientId == key);
+            }
+            catch (Exception) { throw; }
+        }
+
+        public async Task UpdateAsync(Patient item, bool useNavigationalProperties = false)
+        {
+            try
+            {
+                Patient patientFromDb = await ReadAsync(item.PatientId, useNavigationalProperties, false);
+                patientFromDb.Name = item.Name;
+                patientFromDb.Age = item.Age;
+                patientFromDb.Checkout = item.Checkout;
+                patientFromDb.Room = item.Room;
+
+                await dbContext.SaveChangesAsync();
             }
             catch (Exception) { throw; }
         }

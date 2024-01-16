@@ -20,9 +20,8 @@ namespace BusinessLayer
         {
             Patients = new List<Patient>();
         }
-        public Room(int roomId, int capacity)
+        public Room(int capacity)
         {
-            RoomId = roomId;
             Capacity = capacity;
             Patients = new List<Patient>();
         }

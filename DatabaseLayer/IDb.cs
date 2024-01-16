@@ -6,12 +6,17 @@ using System.Threading.Tasks;
 
 namespace DatabaseLayer
 {
-    public interface IDb<T, K>
+    public interface IDb<T, K> where K : IConvertible
     {
-        void Create(T item);
-        T Read(K key, bool usenavigationalproperties = false);
-        IEnumerable<T> ReadAll(bool usenavigationalproperties = false);
-        void Update(T item, bool usenavigationalproperties = false);
-        void Delete(K key);
+        Task CreateAsync(T item);
+
+        Task<T> ReadAsync(K key, bool useNavigationalProperties = false, bool isReadOnly = true);
+
+        Task<ICollection<T>> ReadAllAsync(bool useNavigationalProperties = false, bool isReadOnly = true);
+
+        Task UpdateAsync(T item, bool useNavigationalProperties = false);
+
+        Task DeleteAsync(K key);
+
     }
 }

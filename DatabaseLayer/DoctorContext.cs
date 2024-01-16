@@ -1,6 +1,5 @@
 ﻿using BusinessLayer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System;
 using System.Collections.Generic;
@@ -10,25 +9,24 @@ using System.Threading.Tasks;
 
 namespace DatabaseLayer
 {
-    public class RoomContext : IDb<Room, int>
+    public class DoctorContext : IDb<Doctor, int>
     {
-        private readonly PsychiatryDbContext dbContext;
-
-        public RoomContext(PsychiatryDbContext dbContext)
+        private PsychiatryDbContext dbContext;
+        public DoctorContext(PsychiatryDbContext dbContext)
         {
             this.dbContext = dbContext;
         }
 
-        public async Task CreateAsync(Room item)
+        public async Task CreateAsync(Doctor item)
         {
             try
             {
                 List<Patient> patients = new List<Patient>(item.Patients.Count);
-                foreach (Patient pat in patients)
+                foreach(Patient pat in patients)
                 {
                     Patient patientFromDb = await dbContext.Patients.FindAsync(pat.PatientId);
 
-                    if (patientFromDb != null)
+                    if(patientFromDb != null)
                     {
                         patients.Add(patientFromDb);
                     }
@@ -39,41 +37,35 @@ namespace DatabaseLayer
 
                 }
                 item.Patients = patients;
-                dbContext.Rooms.Add(item);
+                dbContext.Doctors.Add(item);
                 await dbContext.SaveChangesAsync();
             }
-            catch(Exception)
-            {
-                throw;
-            }
-        }
+            catch (Exception) { throw; }
+        }   
 
         public async Task DeleteAsync(int key)
         {
             try
             {
-                Room roomFromDb = await ReadAsync(key, false, false);
-                if (roomFromDb != null)
+                Doctor doctorFromDb = await ReadAsync(key, false, false);
+                if(doctorFromDb != null)
                 {
-                    dbContext.Rooms.Remove(roomFromDb);
+                    dbContext.Doctors.Remove(doctorFromDb);
                     await dbContext.SaveChangesAsync();
                 }
                 else
                 {
-                    throw new ArgumentException("This room does not exist");
+                    throw new ArgumentException("Doctor with that id does not exist!");
                 }
             }
-            catch (Exception)
-            {
-                throw;
-            }
+            catch (Exception) { throw; }
         }
 
-        public async Task<ICollection<Room>> ReadAllAsync(bool useNavigationalProperties = false, bool isReadOnly = true)
+        public async Task<ICollection<Doctor>> ReadAllAsync(bool useNavigationalProperties = false, bool isReadOnly = true)
         {
             try
             {
-                IQueryable<Room> query = dbContext.Rooms;
+                IQueryable<Doctor> query = dbContext.Doctors;
                 if (useNavigationalProperties)
                 {
                     query = query.Include(o => o.Patients);
@@ -82,41 +74,38 @@ namespace DatabaseLayer
                 {
                     query = query.AsNoTrackingWithIdentityResolution();
                 }
+
                 return await query.ToListAsync();
             }
-            catch (Exception)
-            {
-                throw;
-            }
+            catch (Exception) { throw; }
         }
 
-        public async Task<Room> ReadAsync(int key, bool useNavigationalProperties = false, bool isReadOnly = true)
+        public async Task<Doctor> ReadAsync(int key, bool useNavigationalProperties = false, bool isReadOnly = true)
         {
             try
             {
-                IQueryable<Room> query = dbContext.Rooms;
+                IQueryable<Doctor> query = dbContext.Doctors;
                 if (useNavigationalProperties)
                 {
                     query = query.Include(o => o.Patients);
                 }
-                if(isReadOnly)
+                if (isReadOnly)
                 {
                     query = query.AsNoTrackingWithIdentityResolution();
                 }
-                return await query.FirstOrDefaultAsync(r => r.RoomId == key);
+
+                return await query.FirstOrDefaultAsync(o => o.DoctorId   == key);
             }
-            catch(Exception)
-            {
-                throw;
-            }
+            catch (Exception) { throw; }
         }
 
-        public async Task UpdateAsync(Room item, bool useNavigationalProperties = false)
+        public async Task UpdateAsync(Doctor item, bool useNavigationalProperties = false)
         {
             try
             {
-                Room roomFromDb = await ReadAsync(item.RoomId, useNavigationalProperties, false);
-                roomFromDb.Capacity = item.Capacity;
+                Doctor doctorFromDb = await ReadAsync(item.DoctorId, useNavigationalProperties, false);
+                doctorFromDb.Name = item.Name;
+                doctorFromDb.Occupation = item.Occupation;
 
                 if (useNavigationalProperties)
                 {
@@ -124,7 +113,7 @@ namespace DatabaseLayer
                     foreach(var pat in patients)
                     {
                         Patient patientFromDb = await dbContext.Patients.FindAsync(pat.PatientId);
-                        if (patientFromDb != null)
+                        if(patientFromDb != null)
                         {
                             patients.Add(patientFromDb);
                         }
@@ -133,14 +122,11 @@ namespace DatabaseLayer
                             patients.Add(pat);
                         }
                     }
-                    roomFromDb.Patients = patients;
+                    doctorFromDb.Patients = patients;
                 }
                 await dbContext.SaveChangesAsync();
             }
-            catch (Exception)
-            {
-                throw;
-            }
+            catch (Exception) { throw; }
         }
     }
 }

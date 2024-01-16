@@ -7,33 +7,40 @@ using System.Threading.Tasks;
 
 namespace BusinessLayer
 {
-    public class Patient//patientuser class???
+    public class Patient
     {
         [Key]
         [Required]
         public int PatientId { get; set; }
         [Required]
-        public string FirstName { get; set; }
+        [MaxLength(60)]
+        public string Name { get; set; }
         [Required]
-        public string LastName { get; set; }
-        [Required]
+        [Range(10,140, ErrorMessage ="Age must be between 10 and 140!")]
         public int Age { get; set; }
         [Required]
-        public DateTime AdmissionDate { get; set; }
-        public DateTime? Checkout { get; set; }
+        public DateOnly AdmissionDate { get; set; }
+        public DateOnly? Checkout { get; set; }
         public Room Room { get; set; }
-        public Treatment Treatment { get; set; }//for the doctor
 
-        public Patient() { }
-        public Patient(string firstName, string lastName, int age, DateTime admissionDate, DateTime? checkout, Room room, Treatment treatment)
-        {         
-            FirstName = firstName;
-            LastName = lastName;
+        public Patient()
+        {
+            AdmissionDate = DateOnly.FromDateTime(DateTime.Now);
+        }
+        public Patient(string name, int age, DateOnly? checkout, Room room)//with checkout 
+        {
+            Name = Name;
             Age = age;
-            AdmissionDate = admissionDate;
             Checkout = checkout;
             Room = room;
-            Treatment = treatment;
+            AdmissionDate = DateOnly.FromDateTime(DateTime.Now);
+        }
+        public Patient(string name, int age, Room room)//without checkout
+        {
+            Name = Name;
+            Age = age;
+            Room = room;
+            AdmissionDate = DateOnly.FromDateTime(DateTime.Now);
         }
     }
 }

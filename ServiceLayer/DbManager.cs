@@ -7,40 +7,38 @@ using System.Threading.Tasks;
 
 namespace ServiceLayer
 {
-    public class DbManager<T, K>
+    public class DbManager<T, K> where K : IConvertible
     {
-        IDb<T, K> context;
+        private readonly IDb<T, K> context;
 
         public DbManager(IDb<T, K> context)
         {
             this.context = context;
         }
 
-        public void Create(T item)
+        public async Task CreateAsync(T item)
         {
-
-            context.Create(item);
+            await context.CreateAsync(item);
         }
 
-        public T Read(K key, bool useNavigationalProperties = false)
+        public async Task<T> ReadAsync(K key, bool useNavigationalProperties = false)
         {
-            return context.Read(key, useNavigationalProperties);
+            return await context.ReadAsync(key);
         }
 
-        public IEnumerable<T> ReadAll(bool useNavigationalProperties = false)
+        public async Task<ICollection<T>> ReadAllAsync(bool useNavigationalProperties = false)
         {
-            return context.ReadAll(useNavigationalProperties);
+            return await context.ReadAllAsync(useNavigationalProperties);
         }
 
-        public void Update(T item, bool useNavigationalProperties = false)
+        public async Task UpdateAsync(T item, bool useNavigationalProperties = false)
         {
-            context.Update(item, useNavigationalProperties);
+            await context.UpdateAsync(item, useNavigationalProperties);
         }
 
-        public void Delete(K key)
+        public async Task DeleteAsync(K key)
         {
-            context.Delete(key);
+            await context.DeleteAsync(key);
         }
-
     }
 }
