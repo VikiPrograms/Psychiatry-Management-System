@@ -6,11 +6,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 
 namespace DatabaseLayer
 {
-    public class PsychiatryDbContext : DbContext
+    public class PsychiatryDbContext : IdentityDbContext<User>
     {
         public PsychiatryDbContext() { }
         public PsychiatryDbContext(DbContext dbContext) { }

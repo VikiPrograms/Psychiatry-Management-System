@@ -84,17 +84,21 @@ namespace DatabaseLayer
         {
             try
             {
-                IQueryable<Doctor> query = dbContext.Doctors;
-                if (useNavigationalProperties)
+                using (var dbContext = new PsychiatryDbContext())
                 {
-                    query = query.Include(o => o.Patients);
-                }
-                if (isReadOnly)
-                {
-                    query = query.AsNoTrackingWithIdentityResolution();
+                    IQueryable<Doctor> query = dbContext.Doctors;
+                    if (useNavigationalProperties)
+                    {
+                        query = query.Include(o => o.Patients);
+                    }
+                    if (isReadOnly)
+                    {
+                        query = query.AsNoTrackingWithIdentityResolution();
+                    }
+
+                    return await query.FirstOrDefaultAsync(o => o.DoctorId == key);
                 }
 
-                return await query.FirstOrDefaultAsync(o => o.DoctorId   == key);
             }
             catch (Exception) { throw; }
         }
