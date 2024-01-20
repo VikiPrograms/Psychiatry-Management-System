@@ -48,6 +48,7 @@ namespace DatabaseLayer
             try
             {
                 Doctor doctorFromDb = await ReadAsync(key, false, false);
+
                 if(doctorFromDb != null)
                 {
                     dbContext.Doctors.Remove(doctorFromDb);
@@ -83,22 +84,18 @@ namespace DatabaseLayer
         public async Task<Doctor> ReadAsync(int key, bool useNavigationalProperties = false, bool isReadOnly = true)
         {
             try
-            {
-                using (var dbContext = new PsychiatryDbContext())
+            {                              
+                IQueryable<Doctor> query = dbContext.Doctors;
+                if (useNavigationalProperties)
                 {
-                    IQueryable<Doctor> query = dbContext.Doctors;
-                    if (useNavigationalProperties)
-                    {
-                        query = query.Include(o => o.Patients);
-                    }
-                    if (isReadOnly)
-                    {
-                        query = query.AsNoTrackingWithIdentityResolution();
-                    }
-
-                    return await query.FirstOrDefaultAsync(o => o.DoctorId == key);
+                    query = query.Include(o => o.Patients);
+                }
+                if (isReadOnly)
+                {
+                    query = query.AsNoTrackingWithIdentityResolution();
                 }
 
+                return await query.FirstOrDefaultAsync(o => o.DoctorId == key);                
             }
             catch (Exception) { throw; }
         }
