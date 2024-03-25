@@ -1,4 +1,4 @@
-﻿using System;
+﻿    using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Data;
@@ -14,18 +14,23 @@ namespace BusinessLayer
         [Required]
         [MaxLength(40)]
         public string Name { get; set; }
-        [Required]
-        [Range(6, 140, ErrorMessage = "Age must be between 6 and 140!")]
-        public int Age { get; set; }
-       
+
+        public string Password { get; set; }
+        public Role Role { get; set; }
+        public List<Patient> Patients { get; set; }
         public User()
         {
+            Patients = new List<Patient>();
         }
 
-        public User(string name, int age)
+        public User(string username, string password, string email, Role role, string telephone = null)
         {
-            Name = name;
-            Age = age;
+            UserName = username;
+            Password = password;
+            Email = email;
+            Role = role;
+            PhoneNumber = telephone;
+            Patients = new();
         }
     }
 }

@@ -34,12 +34,6 @@ namespace DatabaseLayer
             .HasColumnType("date")
             .IsRequired();
 
-            modelBuilder.Entity<Patient>()
-            .Property(p => p.Checkout)
-            .HasConversion(new DateOnlyConverter())
-            .HasColumnType("date")
-            .IsRequired();
-
             modelBuilder.Entity<Medication>()
             .Property(m => m.Cost)
             .HasColumnType("decimal(18, 2)");

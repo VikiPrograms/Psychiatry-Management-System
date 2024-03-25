@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,27 +21,24 @@ namespace BusinessLayer
         public int Age { get; set; }
         [Required]
         public DateOnly AdmissionDate { get; set; }
-        public DateOnly? Checkout { get; set; }
         public Room Room { get; set; }
+
+        [ForeignKey("User")]
+        public string? UserId { get; set; }
+
+        public User? User { get; set; }
 
         public Patient()
         {
             AdmissionDate = DateOnly.FromDateTime(DateTime.Now);
         }
-        public Patient(string name, int age, DateOnly? checkout, Room room)//with checkout 
+        public Patient(string name, int age, User? user = null)//with checkout 
         {
             Name = Name;
             Age = age;
-            Checkout = checkout;
-            Room = room;
+            //Room = room;
             AdmissionDate = DateOnly.FromDateTime(DateTime.Now);
-        }
-        public Patient(string name, int age, Room room)//without checkout
-        {
-            Name = Name;
-            Age = age;
-            Room = room;
-            AdmissionDate = DateOnly.FromDateTime(DateTime.Now);
+            User = user;
         }
     }
 }

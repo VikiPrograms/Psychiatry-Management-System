@@ -81,7 +81,6 @@ namespace DatabaseLayer
                 Patient patientFromDb = await ReadAsync(item.PatientId, useNavigationalProperties, false);
                 patientFromDb.Name = item.Name;
                 patientFromDb.Age = item.Age;
-                patientFromDb.Checkout = item.Checkout;
                 patientFromDb.Room = item.Room;
 
                 await dbContext.SaveChangesAsync();
